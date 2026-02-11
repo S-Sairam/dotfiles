@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# 1. Handle Clicks
+case $BLOCK_BUTTON in
+    1) playerctl play-pause ;;
+    2) playerctl previous ;;
+    3) playerctl next ;;
+esac
+
+# FIX: Wait 0.2s for the player to actually react to the click
+# before checking the status again.
+[ -n "$BLOCK_BUTTON" ] && sleep 0.5
+
+# 2. Get Status
+STATUS=$(playerctl status 2>/dev/null)
+
+# 3. Display Logic
+if [ "$STATUS" = "Playing" ]; then
+    ARTIST=$(playerctl metadata artist)
+    TITLE=$(playerctl metadata title)
+    printf " %s - %s\n" "$ARTIST" "$TITLE" | sed 's/\(.\{35\}\).*/\1.../'
+elif [ "$STATUS" = "Paused" ]; then
+    echo " Paused"
+else
+    echo ""
+fi

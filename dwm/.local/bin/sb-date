@@ -1,0 +1,8 @@
+#!/bin/sh
+# Output: Thu 29 Jan 07:49
+date '+%a %d %b %H:%M'
+
+case $BLOCK_BUTTON in
+	1) notify-send "This Month" "$(cal --color=always | sed "s/..7m/<b><span color=\"red\">/;s/..27m/<\/span><\/b>/")" ;;
+	3) notify-send "Full Appointment List" "$(cal -y)" ;;
+esac

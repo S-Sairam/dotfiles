@@ -1,0 +1,6 @@
+#!/bin/sh
+case $BLOCK_BUTTON in
+    1) setsid -f /home/sai/.local/bin/apple-lock ;;
+    3) systemctl poweroff ;;
+esac
+echo "⏻  "

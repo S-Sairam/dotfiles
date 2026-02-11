@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# 1. Handle Clicks
+# We send a signal (RTMIN+8) after changing volume to force a refresh.
+# (34 + 8 = 42, but pkill handles the math with RTMIN+8)
+case "${BLOCK_BUTTON:-0}" in
+	1) wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle ;;
+	4) wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ ;;
+	5) wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- ;;
+esac
+
+# 2. Update the status bar
+# If we just clicked, send the signal to refresh the block cleanly
+if [ "${BLOCK_BUTTON:-0}" -ne 0 ]; then
+    pkill -RTMIN+8 dwmblocks
+fi
+
+# 3. Get Status
+# We sleep briefly to ensure the signal catch doesn't race with the read
+vol_str=$(wpctl get-volume @DEFAULT_AUDIO_SINK@)
+
+if echo "$vol_str" | grep -q "MUTED"; then
+	echo "󰝟 Muted"
+else
+	vol=$(echo "$vol_str" | awk '{print int($2 * 100)}')
+	echo "󰕾 $vol%"
+fi

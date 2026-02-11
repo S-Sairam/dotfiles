@@ -1,0 +1,6 @@
+#!/bin/sh
+case $BLOCK_BUTTON in
+	1) notify-send "Disk Space" "$(df -h)" ;;
+esac
+
+df -h / | awk 'NR==2 {print $4}'

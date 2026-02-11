@@ -1,0 +1,100 @@
+#!/bin/sh
+
+# --- CONFIGURATION ---
+WALLPAPER="/home/sai/Pictures/wallpapers/main.jpg"
+CACHE_DIR="$HOME/.cache"
+LOCK_IMAGE="$CACHE_DIR/lock_wallpaper.png"
+GLOW_IMAGE="$CACHE_DIR/lock_glow_temp.png"
+TEXT=""
+
+# --- FONT SETTINGS ---
+FONT="Sans"
+TIME_SIZE=40
+DATE_SIZE=18
+TEXT_SIZE=28
+STATUS_SIZE=25
+
+# --- COLORS (AARRGGBB) ---
+WHITE="FFFFFFFF"          
+CUSTOM_RING="44c3c9c5"    
+TRANS="00000000"          
+
+# --- GENERATION LOGIC ---
+if [ ! -f "$LOCK_IMAGE" ]; then
+    echo "Generating cache..."
+    
+    # Step 1: Create the blurred background
+    magick "$WALLPAPER" -filter Gaussian -resize 20% -blur 0x3 -resize 500% "$LOCK_IMAGE"
+
+    # Step 2: Create the 'Halo Ring' (Larger Radius)
+    # - size 800x800: Canvas size
+    # - stroke ...: The color of the light (White, 50% opacity)
+    # - strokewidth 15: Thickness of the light band
+    # - draw circle: Center(400,400) to Edge(400,245) = Radius 155px (Previously 130px)
+    # - blur 0x18: Slightly softer blur for the larger ring
+    
+    magick -size 800x800 xc:transparent \
+        -fill none \
+        -stroke "rgba(255,255,255,0.5)" \
+        -strokewidth 15 \
+        -draw "circle 400,400 400,245" \
+        -blur 0x18 \
+        "$GLOW_IMAGE"
+
+    # Step 3: Combine them
+    magick "$LOCK_IMAGE" "$GLOW_IMAGE" -gravity center -composite "$LOCK_IMAGE"
+    
+    # Clean up temp file
+    rm "$GLOW_IMAGE"
+fi
+
+# --- EXECUTE ---
+i3lock \
+--image "$LOCK_IMAGE" \
+--fill \
+\
+--clock \
+--time-str="%H:%M" \
+--date-str="%A, %B %d" \
+--time-size=$TIME_SIZE \
+--date-size=$DATE_SIZE \
+--time-font="$FONT" \
+--date-font="$FONT" \
+\
+--indicator \
+--radius 120 \
+--ring-width 8 \
+\
+--inside-color=$TRANS \
+--ring-color=$CUSTOM_RING \
+--line-color=$TRANS \
+--separator-color=$TRANS \
+\
+--keyhl-color=$WHITE \
+--bshl-color=$WHITE \
+\
+--insidever-color=$TRANS \
+--ringver-color=$WHITE \
+--verif-color=$WHITE \
+--verif-size=$STATUS_SIZE \
+--verif-font="$FONT" \
+\
+--insidewrong-color=$TRANS \
+--ringwrong-color=$WHITE \
+--wrong-color=$WHITE \
+--wrong-size=$STATUS_SIZE \
+--wrong-font="$FONT" \
+\
+--time-color=$WHITE \
+--date-color=$WHITE \
+--greeter-color=$WHITE \
+--layout-color=$WHITE \
+\
+--verif-text="Verifying..." \
+--wrong-text="Incorrect" \
+--noinput-text="" \
+--greeter-text="$TEXT" \
+--greeter-size=$TEXT_SIZE \
+--greeter-font="$FONT" \
+\
+--screen 1

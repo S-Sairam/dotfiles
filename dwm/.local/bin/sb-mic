@@ -1,0 +1,12 @@
+#!/bin/sh
+case $BLOCK_BUTTON in
+	1) pamixer --default-source -t ;;
+esac
+
+mute=$(pamixer --default-source --get-mute)
+
+if [ "$mute" = "true" ]; then
+	echo ""
+else
+	echo ""
+fi

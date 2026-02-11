@@ -1,0 +1,8 @@
+#!/bin/sh
+case $BLOCK_BUTTON in
+    1) greenclip print | dmenu -l 10 -p "Clipboard" | xargs -r -0 greenclip print ;;
+    3) greenclip clear ;;
+esac
+
+COUNT=$(greenclip print | wc -l)
+echo "📋 $COUNT"

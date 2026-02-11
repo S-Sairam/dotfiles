@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Change BAT0 to BAT1 if needed (check /sys/class/power_supply/)
+BAT="BAT0"
+CAPACITY=$(cat /sys/class/power_supply/$BAT/capacity)
+STATUS=$(cat /sys/class/power_supply/$BAT/status)
+
+# Display logic
+if [ "$STATUS" = "Charging" ]; then
+	printf " %s%%" "$CAPACITY"
+else
+	printf "  %s%%" "$CAPACITY"
+fi
+
+# Click logic (Case statement is safer than integer math)
+case $BLOCK_BUTTON in
+	1) notify-send "Battery Status" "$(acpi -b)" ;;
+esac

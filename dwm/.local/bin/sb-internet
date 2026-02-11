@@ -1,0 +1,12 @@
+#!/bin/sh
+case $BLOCK_BUTTON in
+    1) setsid -f alacritty -e nmtui ;;
+    3) pkill -RTMIN+1 dwmblocks ;;
+esac
+
+CON=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2)
+if [ -n "$CON" ]; then
+    echo "  $CON"
+else
+    echo "  Off"
+fi
